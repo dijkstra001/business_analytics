@@ -1,6 +1,6 @@
 setwd("D:/DATA SCIENCE/CURSOS E TREINAMENTOS/BUSINESS-ANALYTICS/hr_analysis")
 getwd()
-
+library(plyr)
 library(caret)
 library(ggplot2)
 library(gridExtra)
@@ -64,8 +64,64 @@ dim(withoutVoluntaryResignation)
 
 # EXPLORATORY ANALYSIS
 
+ggplot(dataset) + geom_bar(aes(x = Gender))
+ggplot(dataset) + geom_density(aes(x = Age))
+ggplot(dataset) + geom_bar(aes(x = Attrition))
+ggplot(dataset) + geom_bar(aes(x = Department))
+ggplot(dataset) + geom_bar(aes(x = JobRole))
+ggplot(dataset) + geom_bar(aes(x = Education)) + facet_grid(~EducationField)
 
+vTotalWorkingYears <- ggplot(dataset) + geom_density(aes(x = TotalWorkingYears))
+vYearsAtCompany <- ggplot(dataset) + geom_density(aes(x = YearsAtCompany))
+vYearsSinceLastPromotion <- ggplot(dataset) + geom_density(aes(x = YearsSinceLastPromotion))
+vYearsWithCurrManager <- ggplot(dataset) + geom_density(aes(x = YearsWithCurrManager))
+vYearsInCurrentRole <- ggplot(dataset) + geom_density(aes(x = YearsInCurrentRole))
+vPriorYearsOfExperience <- ggplot(dataset) + geom_density(aes(x = PriorYearsOfExperience))
 
+grid.arrange(vTotalWorkingYears,
+             vYearsAtCompany,
+             vYearsSinceLastPromotion,
+             vYearsWithCurrManager,
+             vYearsInCurrentRole,
+             vPriorYearsOfExperience,
+             nrow = 2,
+             ncol = 3)
 
+# % employee per years of experience (1, 3, 5, 7, 10):
+length(which(dataset$PriorYearsOfExperience < 1)) / length(dataset$PriorYearsOfExperience)
+length(which(dataset$PriorYearsOfExperience < 3)) / length(dataset$PriorYearsOfExperience)
+length(which(dataset$PriorYearsOfExperience < 5)) / length(dataset$PriorYearsOfExperience)
+length(which(dataset$PriorYearsOfExperience < 7)) / length(dataset$PriorYearsOfExperience)
+length(which(dataset$PriorYearsOfExperience < 10)) / length(dataset$PriorYearsOfExperience)
 
+# % employee with < 30 years old:
+length(which(dataset$Age < 30)) / length(dataset$Age)
 
+# % employee with graduation and master degree:
+length(which(dataset$Education == 3)) / length(dataset$Education)
+length(which(dataset$Education == 4)) / length(dataset$Education)
+
+# Showing salary per month by satisfaction work level:
+ggplot(data = subset(dataset, !is.na(JobSatisfaction)), aes(x = JobSatisfaction, MonthlyIncome)) +
+  geom_boxplot()
+
+# Calculating the corr between variables:
+cor(dataset$TotalWorkingYears, dataset$YearsAtCompany, use = 'complete.obs')
+cor(dataset$YearsAtCompany, dataset$YearsInCurrentRole, use = 'complete.obs')
+cor(dataset$YearsAtCompany, dataset$YearsSinceLastPromotion, use = 'complete.obs')
+cor(dataset$YearsAtCompany, dataset$YearsWithCurrManager, use = 'complete.obs')
+cor(dataset$YearsAtCompany, dataset$MonthlyIncome, use = 'complete.obs')
+cor(dataset$TotalWorkingYears, dataset$MonthlyIncome, use = 'complete.obs')
+
+ggplot(dataset) + geom_point(aes(TotalWorkingYears, MonthlyIncome))
+ggplot(dataset) + geom_point(aes(YearsAtCompany, MonthlyIncome))
+
+ggplot(data = subset(dataset, !is.na(WorkLifeBalance)), aes(WorkLifeBalance, MonthlyIncome)) +
+  geom_boxplot()
+
+# Salary diff per Gender:
+ggplot(data = subset(dataset, !is.na(Gender)), aes(Gender, MonthlyIncome, fill = Gender)) +
+  geom_boxplot() +
+  theme(legend.position = 'none', plot.title = element_text(hjust = 0.5, size = 10)) +
+  labs(x = 'Gender', y = 'Monthly Income', title = 'Monthly income by Gender') +
+  coord_flip()
