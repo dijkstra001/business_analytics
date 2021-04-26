@@ -125,3 +125,34 @@ ggplot(data = subset(dataset, !is.na(Gender)), aes(Gender, MonthlyIncome, fill =
   theme(legend.position = 'none', plot.title = element_text(hjust = 0.5, size = 10)) +
   labs(x = 'Gender', y = 'Monthly Income', title = 'Monthly income by Gender') +
   coord_flip()
+
+# Job role insights:
+ggplot(data = subset(dataset, !is.na(JobRole))) + geom_boxplot(aes(JobRole, MonthlyIncome)) +
+  ggtitle('Monthly income per Job role')
+
+ggplot(data = subset(dataset, !is.na(JobRole))) + geom_boxplot(aes(JobRole, AgeStartedWorking)) +
+  ggtitle('Age starting working per Job role')
+
+ggplot(data = subset(dataset, !is.na(JobRole))) + geom_boxplot(aes(JobRole, Age)) +
+  ggtitle('Age per Job role')
+
+ggplot(data = subset(dataset, !is.na(JobRole))) + geom_boxplot(aes(JobRole, YearsAtCompany)) +
+  ggtitle('Years at company per Job role')
+
+ggplot(data = na.omit(dataset)) + geom_bar(aes(JobRole, fill = Education), position = 'fill') +
+  ggtitle('Education level per Job role') +
+  ylab('Proportion')
+
+# Multivariable analysis - hiring process:
+ggplot(data = withoutTermination) + geom_bar(aes(x = Education, fill = Attrition), position = 'fill') +
+  facet_grid(.~Department)
+
+ggplot(data = withoutTermination) + geom_bar(aes(x = Education, fill = Attrition), position = 'fill') +
+  facet_grid(.~JobRole)
+
+ggplot(data = withoutTermination) + geom_bar(aes(x = EducationField, fill = Attrition), position = 'fill') +
+  facet_grid(.~JobRole) +
+  theme(axis.text.x = element_text(angle = -90, hjust = 0))
+
+
+# MODELING DATA FOR ML ALGORITHMS:
