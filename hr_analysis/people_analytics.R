@@ -156,3 +156,32 @@ ggplot(data = withoutTermination) + geom_bar(aes(x = EducationField, fill = Attr
 
 
 # MODELING DATA FOR ML ALGORITHMS:
+
+model_1 <- glm(Attrition ~ Age + Department + DistanceFromHome + `Employee Source` +
+                 JobRole + MaritalStatus + AverageTenure + PriorYearsOfExperience + Gender +
+                 Education + EducationField,
+               family = binomial,
+               data = dataset)
+summary(model_1)
+vif(model_1)
+
+# Create train and test databases:
+set.seed(2004)
+i_train <- sample.split(Y = dataset$Attrition, SplitRatio = 0.7)
+ds_train <- subset(withoutTermination, train = T)
+ds_test <- subset(withoutTermination, train = F)
+
+model_2 <- glm(Attrition ~ Age + Department + DistanceFromHome + `Employee Source` +
+                   JobRole + MaritalStatus + AverageTenure + PriorYearsOfExperience + Gender +
+                   Education + EducationField,
+                 family = binomial,
+                 data = ds_train)
+summary(model_2)
+vif(model_2)
+
+# Calculating prevision of model_2:
+threshold <- 0.5
+
+p_model_2 <- predict(model_2, type = 'response', newdata = ds_test)
+pf_model_2 <- ifelse(p_model_2 > threshold, 'Voluntary Resignation', 'Current employee')
+table(ds_test$Attrition, pf_model_2)
