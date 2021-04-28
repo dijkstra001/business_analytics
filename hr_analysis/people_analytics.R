@@ -179,9 +179,46 @@ model_2 <- glm(Attrition ~ Age + Department + DistanceFromHome + `Employee Sourc
 summary(model_2)
 vif(model_2)
 
+model_3 <- glm(Attrition ~ Age + Department + DistanceFromHome + `Employee Source` +
+                 JobRole + MaritalStatus + AverageTenure + PriorYearsOfExperience + Gender,
+               family = binomial,
+               data = ds_train)
+summary(model_3)
+vif(model_3)
+
+model_4 <- glm(Attrition ~ Age + Department + DistanceFromHome + `Employee Source` +
+                 JobRole + MaritalStatus + AverageTenure + PriorYearsOfExperience,
+               family = binomial,
+               data = ds_train)
+summary(model_4)
+vif(model_4)
+
+model_5 <- rpart(Attrition ~ Age + Department + DistanceFromHome + `Employee Source` +
+                 JobRole + MaritalStatus + AverageTenure + PriorYearsOfExperience,
+               method = 'class',
+               control = rpart.control(minsplit = 500, cp = 0),
+               data = ds_train)
+summary(model_5)
+rpart.plot(model_5)
+
 # Calculating prevision of model_2:
 threshold <- 0.5
 
 p_model_2 <- predict(model_2, type = 'response', newdata = ds_test)
 pf_model_2 <- ifelse(p_model_2 > threshold, 'Voluntary Resignation', 'Current employee')
 table(ds_test$Attrition, pf_model_2)
+
+
+# Calculating prevision of model_3:
+threshold <- 0.5
+
+p_model_3 <- predict(model_3, type = 'response', newdata = ds_test)
+pf_model_3 <- ifelse(p_model_3 > threshold, 'Voluntary Resignation', 'Current employee')
+table(ds_test$Attrition, pf_model_3)
+
+# Calculating prevision of model_4:
+threshold <- 0.5
+
+p_model_4 <- predict(model_4, type = 'response', newdata = ds_test)
+pf_model_4 <- ifelse(p_model_4 > threshold, 'Voluntary Resignation', 'Current employee')
+table(ds_test$Attrition, pf_model_4)
