@@ -1,0 +1,2 @@
+setwd("D:/DATA SCIENCE/CURSOS E TREINAMENTOS/BUSINESS-ANALYTICS/health_analytics")
+getwd()
