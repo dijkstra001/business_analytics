@@ -1,2 +1,131 @@
 setwd("D:/DATA SCIENCE/CURSOS E TREINAMENTOS/BUSINESS-ANALYTICS/health_analytics")
 getwd()
+
+library(dplyr)
+library(ggcorrplot)
+library(forecast)
+library(nnet)
+library(neuralnet)
+
+dataset <- read.csv('dataset.csv', header = T, na.strings = c(""))
+dim(dataset)
+View(dataset)
+
+# Predicting life span of patients who underwent liver transplantation after one year
+
+# EXPLORATORY ANALYSIS:
+
+hist(dataset$AGE)
+hist(dataset$AGE_DON)
+hist(dataset$PTIME)
+hist(dataset$ï..DAYSWAIT_CHRON)
+hist(dataset$FINAL_MELD_SCORE)
+
+
+dataset$DIAB <- as.factor(dataset$DIAB)
+table(dataset$DIAB)
+
+dataset$PSTATUS <- as.factor(dataset$PSTATUS)
+table(dataset$PSTATUS)
+
+dataset$GENDER <- as.factor(dataset$GENDER)
+table(dataset$GENDER)
+
+dataset$GENDER_DON <- as.factor(dataset$GENDER_DON)
+table(dataset$GENDER_DON)
+
+dataset$REGION <- as.factor(dataset$REGION)
+table(dataset$REGION)
+
+dataset$TX_Year <- as.factor(dataset$TX_Year)
+table(dataset$TX_Year)
+
+dataset$MALIG <- as.factor(dataset$MALIG)
+table(dataset$MALIG)
+
+dataset$HIST_CANCER_DON <- as.factor(dataset$HIST_CANCER_DON)
+table(dataset$HIST_CANCER_DON)
+
+dataset$PX_STAT <- as.factor(dataset$PX_STAT)
+table(dataset$PX_STAT)
+
+dataset$ABO <- as.factor(dataset$ABO)
+table(dataset$ABO)
+
+dataset$PERM_STATE <- as.factor(dataset$PERM_STATE)
+table(dataset$PERM_STATE)
+
+dataset$PREV_TX <- as.factor(dataset$PREV_TX)
+table(dataset$PREV_TX)
+
+dataset$COD_CAD_DON <- as.factor(dataset$COD_CAD_DON)
+table(dataset$COD_CAD_DON)
+
+dataset$ETHCAT_DON <- as.factor(dataset$ETHCAT_DON)
+table(dataset$ETHCAT_DON)
+
+dataset$ETHCAT <- as.factor(dataset$ETHCAT)
+table(dataset$ETHCAT)
+
+dataset$HOME_STATE_DON <- as.factor(dataset$HOME_STATE_DON)
+table(dataset$HOME_STATE_DON)
+
+dataset$HIST_IV_DRUG_OLD_DON <- as.factor(dataset$HIST_IV_DRUG_OLD_DON)
+table(dataset$HIST_IV_DRUG_OLD_DON)
+
+dataset$ALCOHOL_HEAVY_DON <- as.factor(dataset$ALCOHOL_HEAVY_DON)
+table(dataset$ALCOHOL_HEAVY_DON)
+
+dataset$TX_MELD <- as.factor(dataset$TX_MELD)
+table(dataset$TX_MELD)
+
+dataset$DIABETES_DON <- as.factor(dataset$DIABETES_DON)
+table(dataset$DIABETES_DON)
+
+dataset$ABO_MAT <- as.factor(dataset$ABO_MAT)
+table(dataset$ABO_MAT)
+
+# Patients that survived at first year after surgery:
+ds1 <- dataset %>% filter(PTIME > 365) %>% mutate(PTIME = (PTIME - 365))
+dim(ds1)
+
+# Patients that survived at three years after the first year of surgery:
+ds2 <- ds1 %>% filter(PTIME <= 1095)
+dim(ds2)
+
+# Separate num and categorical variables:
+ds_num <- ds2[, !unlist(lapply(ds2, is.factor))]
+dim(ds_num)
+ds_num <- ds_num[, !unlist(lapply(ds_num, is.character))]
+str(ds_num)
+
+ds_cat <- ds2[, unlist(lapply(ds2, is.factor))]
+dim(ds_cat)
+
+# Corr numerical variables:
+ds_corr <- round(cor(ds_num, use = 'complete.obs'), 2)
+ggcorrplot(ds_corr)
+
+# Data Standardization:
+ds_num_norm <- scale(ds_num)
+ds <- cbind(ds_num_norm, ds_cat)
+dim(ds)
+View(ds)
+
+# Separate data in train and test dataset:
+set.seed(1)
+index <- sample(1:nrow(ds), dim(ds)[1]*.7)
+ds_train <- ds[index, ]
+ds_test <- ds[-index, ]
+
+ds_train <- ds_train %>%
+  filter(TX_Year != 2001) %>%
+  filter(TX_Year != 2002)
+
+ds_test <- ds_test %>%
+  filter(TX_Year != 2001) %>%
+  filter(TX_Year != 2002)
+
+
+# CREATING REGRESSION MODEL:
+
