@@ -128,4 +128,24 @@ ds_test <- ds_test %>%
 
 
 # CREATING REGRESSION MODEL:
+model_1 <- lm(PTIME ~ FINAL_MELD_SCORE +
+                REGION +
+                LiverSize +
+                LiverSizeDon +
+                ALCOHOL_HEAVY_DON +
+                MALIG +
+                TX_Year,
+              data = ds_train)
 
+summary(model_1)
+
+p_model_1 <- predict(model_1, newdata = ds_train)
+accuracy(p_model_1, ds_train$PTIME)
+
+p_model_2 <- predict(model_1, newdata = ds_test)
+accuracy(p_model_2, ds_test$PTIME)
+
+# Distribution error:
+par(mfrow = c(1,1))
+residues <- ds_test$PTIME - p_model_2
+hist(residues, xlab = 'Resíduos', main = 'Sobreviventes de 1 a 3 anos')
